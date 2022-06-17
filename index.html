@@ -4,9 +4,113 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Music Player</title>
+    <!-- Google Font Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Link CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 <body>
-    
+    <div id="main">
+        <!-- Header -->
+        <div id="header">
+            <div class="grid">
+                <div class="header-navbar">
+                    <!-- Logo -->
+                    <div class="header-navbar__logo">
+                        <a href="#" class="header-navbar__home">
+                            <i class="fa-solid fa-music logo-music-icon"></i>
+                        </a>
+                    </div>
+                    <!-- Search -->
+                    <div class="header-navbar__search-session">
+                        <div class="header-navbar__search">
+                            <i class="fa-solid fa-magnifying-glass header-navbar__search-icon"></i>
+                            <input type="text" class="header-navbar__search-input" placeholder="Nhập bài hát cần tìm">
+                        </div>
+
+                        <div class="header-navbar__search-history">
+                            <ul class="list-search-history">
+                                <li class="list-search-history__item">Have It All</li>
+                                <li class="list-search-history__item">Your Name</li>
+                                <li class="list-search-history__item">No Plans</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Setting -->
+                    <div class="header-navbar__setting-wrapper">
+                        <div class="header-navbar__btn-upgrade">Upgrade Plan</div>
+                        <i class="fa-solid fa-gear"></i>
+                        <i class="fa-solid fa-bell bell-icon">
+                            <span class="bell-icon--active"></span>
+                        </i>
+                        <img src="./assets/images/profile.jpg" alt="" class="img-profile" />
+                        <div class="setting-wrapper__add-account">
+                            <i class="fa-solid fa-plus setting-wrapper__add-account-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Body -->
+        <div id="body">
+            <div class="grid">
+                <div class="container">
+                    <!-- CD -->
+                    <div class="cd">
+                        <div class="cd-box">
+                            <div class="cd-box__interactive">
+                                <i class="fa-regular fa-heart cd-box__interactive-heart--emty"></i>
+                                <i class="fa-solid fa-heart cd-box__interactive-heart--cover"></i>
+                            </div>
+                            <div class="cd-box__thumb-song" style="background-image: url('./assets/images/song1.jpg')"></div>
+                        </div>
+                        <!-- Control -->
+                        <div class="control">
+                            <div class="control__btn-random">
+                                <i class="fa-solid fa-shuffle"></i>
+                            </div>
+                            <div class="control__btn-prev">
+                                <i class="fa-solid fa-backward-step"></i>
+                            </div>
+                            <div class="control__btn-tonggle">
+                                <i class="fa-solid fa-circle-pause control__btn-play"></i> 
+                                <i class="fa-solid fa-circle-play control__btn-pause"></i>
+                            </div>
+                            <div class="control__btn-next">
+                                <i class="fa-solid fa-forward-step"></i>
+                            </div>
+                            <div class="control__btn-repeat">
+                                <i class="fa-solid fa-repeat"></i>
+                            </div>
+                        </div>
+                        <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+                        <audio id="audio" src=""></audio>
+                    </div>
+                    <!-- Playlist -->
+                    <div class="playlist-wrapper">
+                        <div class="now-playing">
+                            Now playing:
+                            <h2 class="now-playing__name-song">Name Song - Singers</h2>
+                        </div>
+                        <div class="playlist scroll">
+                            
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <div id="footer">
+
+        </div>
+    </div>
+    <script src="./assets/js/main.js"></script>
 </body>
 </html>
