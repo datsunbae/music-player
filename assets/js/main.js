@@ -16,34 +16,35 @@ const appMusicPlayer = {
     currentIndex: 0,
     isPlaying: false,
     isRandom: false,
+    isRepeat: false,
     songs:  [
         {
             name: '此生过半 - DJ阿卓版',
-            singer: 'China',
+            singer: '豆包',
             path: './assets/music/song1.mp3',
             image: './assets/images/song1.jpg'
         },
         {
             name: '此生过半 - DJ阿卓版',
-            singer: 'China',
+            singer: '豆包',
             path: './assets/music/song2.mp3',
             image: './assets/images/song2.jpg'
         },
         {
             name: '此生过半 - DJ阿卓版',
-            singer: 'China',
+            singer: '豆包',
             path: './assets/music/song3.mp3',
             image: './assets/images/song3.jpg'
         },
         {
             name: '太想念',
-            singer: 'China',
+            singer: '彭筝',
             path: './assets/music/song4.mp3',
             image: './assets/images/song4.jpg'
         },
         {
             name: '赤伶',
-            singer: 'China',
+            singer: '彭筝',
             path: './assets/music/song5.mp3',
             image: './assets/images/song5.jpg'
         },
@@ -78,30 +79,45 @@ const appMusicPlayer = {
             image: './assets/images/song10.jpg'
         }
     ],
-    render: function() {
-        const htmls = this.songs.map(function(song, index) {
-            return `
-                    <div class="song ">
-                    <div class="song__number">${index + 1}</div>
-                    <div class="song__bnt-tonggle">
-                        <i class="fa-solid fa-pause song__btn_tonggle-play"></i>
-                        <i class="fa-solid fa-play song__btn_tonggle-pause"></i>
-                    </div>
-                    <div class="song__name">${song.name}</div>
-                    <div class="song__duration">4:05</div>
-                    <div class="song-hover">
-                        <div class="song-hover__btn-heart">
-                        <i class="fa-regular fa-heart song-hover__btn-heart--empty"></i>
-                        <i class="fa-solid fa-heart song-hover__btn-heart--cover"></i>
-                    </div>
-                    <div class="song-hover__btn-option">
-                        <i class="fa-solid fa-ellipsis"></i>
+    render: async function() {
+        const _this = this;
+
+        playList.innerHTML = '';
+        for(let i=0; i<this.songs.length; i++) {
+            let audioCurrent = document.createElement("audio");
+            audioCurrent.src = this.songs[i].path;
+            let time = await this.getDuration(audioCurrent)/60;
+            
+            playList.insertAdjacentHTML('beforeend', `
+                        <div class="song ${i === this.currentIndex ? 'song-active' : ''}" data-index = ${i}>
+                        <div class="song__number">${i + 1}</div>
+                        <div class="song__bnt-tonggle">
+                            <i class="fa-solid fa-pause song__btn_tonggle-play"></i>
+                            <i class="fa-solid fa-play song__btn_tonggle-pause"></i>
+                        </div>
+                        <div class="song__name">${this.songs[i].name}</div>
+                        <div class="song__duration">${time.toString().split(".")[0]}:${((time % 1)*60).toFixed(0)}</div>
+                    
+                        <div class="song-hover">
+                            <div class="song-hover__btn-heart">
+                            <i class="fa-regular fa-heart song-hover__btn-heart--empty"></i>
+                            <i class="fa-solid fa-heart song-hover__btn-heart--cover"></i>
+                        </div>
+                        <div class="song-hover__btn-option">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            `
+                `)
+        } 
+    },
+    getDuration: function(song){
+        return new Promise(function(resolve){
+            song.addEventListener('loadedmetadata', () => {
+                let time = song.duration;
+                resolve(time);
+            })
         })
-        playList.innerHTML = htmls.join('');
     },
     defineProperty: function (){
         Object.defineProperty(this, 'currentSong' ,{
@@ -111,10 +127,9 @@ const appMusicPlayer = {
         })
     },
     loadCurrentSong: function() {
-        infoSong.textContent = this.currentSong.name;
+        infoSong.textContent = `${this.currentSong.name} - ${this.currentSong.singer}`;
         imgSong.style.backgroundImage = `url('${this.currentSong.image}')`;
         audio.src = this.currentSong.path;
-        console.log(this.currentSong.path)
     },
     handleEvent: function(){
         const _this = this;
@@ -168,21 +183,61 @@ const appMusicPlayer = {
 
         // Next song
         btnNext.onclick = function(){
-            _this.nextSong();
+            if(_this.isRandom){
+                _this.randomSong();
+            }
+            else{
+                _this.nextSong();
+            }
             audio.play();
+            (async function(){
+                await _this.render();
+                _this.scrollToSong();
+            })()
+           
+           
         }
 
         // Prev song
         btnPrev.onclick = function() {
-            _this.prevSong();
+            if(_this.isRandom){
+                _this.randomSong();
+            }
+            else{
+                _this.prevSong();
+            }
             audio.play();
+            _this.render();
+            _this.scrollToSong();
+            
         }
 
-        btnRandom.onclick = function(){
+        // Random song
+        btnRandom.onclick = function() {
             _this.isRandom = !_this.isRandom;
-            btnRandom.classList.tonggle('active', _this.isRandom);
+            if(_this.isRepeat) {
+                _this.isRepeat = !_this.isRepeat;
+                btnRepeat.classList.toggle("active", _this.isRepeat); 
+            }
+            btnRandom.classList.toggle("active", _this.isRandom);
         }
-        
+
+        // Repeat song
+        btnRepeat.onclick = function() {
+            _this.isRepeat = !_this.isRepeat;
+            if(_this.isRandom) {
+                _this.isRandom = !_this.isRandom;
+                btnRandom.classList.toggle("active", _this.isRandom);
+            }
+            btnRepeat.classList.toggle("active", _this.isRepeat);
+        }
+
+        // End Song
+        audio.onended = function(){
+            _this.handleAutoChangeSong();
+            _this.render();
+            _this.scrollToSong();
+        }
     },
     nextSong: function(){
         this.currentIndex++;
@@ -206,13 +261,29 @@ const appMusicPlayer = {
             newIndex = Math.floor(Math.random() * this.songs.length)
         }while(newIndex === this.currentIndex);
         this.currentIndex = newIndex;
+        this.loadCurrentSong();
+    },
+    scrollToSong: function(){
+         $('.song.song-active').scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        })
+    },
+    handleAutoChangeSong: function(){
+        if(!this.isRepeat){
+            this.nextSong();
+        }
+        if(this.isRandom){
+            this.randomSong();
+        }
+        progress.value = 0;
+        audio.play();
     },
     start: function() {
         this.defineProperty();
         this.handleEvent();
         this.loadCurrentSong();
-        this.render();
-        
+        this.render(); 
     }
 }
 
