@@ -7,6 +7,7 @@ const imgSong = $('.cd-box__thumb-song');
 const audio = $('#audio');
 const play = $('.control__btn-tonggle');
 const progress = $('#progress');
+const volume = $('#progress-volume');
 const btnNext = $('.control__btn-next');
 const btnPrev = $('.control__btn-prev');
 const btnRandom = $('.control__btn-random');
@@ -156,6 +157,7 @@ const appMusicPlayer = {
         audio.onplay = function(){
             _this.isPlaying = true;
             play.classList.add('control__btn-tonggle-playing');
+            audio.volume = volume.value;
             cdAnimate.play();
         }
 
@@ -181,6 +183,12 @@ const appMusicPlayer = {
             audio.currentTime = seekTime;
         }
 
+        // Seek volume
+        volume.oninput = function(e){
+            const seekVolume = e.target.value;
+            audio.volume = seekVolume;
+        }
+
         // Next song
         btnNext.onclick = function(){
             if(_this.isRandom){
@@ -190,12 +198,11 @@ const appMusicPlayer = {
                 _this.nextSong();
             }
             audio.play();
-            (async function(){
-                await _this.render();
-                _this.scrollToSong();
-            })()
-           
-           
+            audio.volume = 0.2
+            _this.handleDOMNewSong();
+            _this.scrollToSong();
+            
+            
         }
 
         // Prev song
@@ -207,7 +214,7 @@ const appMusicPlayer = {
                 _this.prevSong();
             }
             audio.play();
-            _this.render();
+            _this.handleDOMNewSong();
             _this.scrollToSong();
             
         }
@@ -235,8 +242,18 @@ const appMusicPlayer = {
         // End Song
         audio.onended = function(){
             _this.handleAutoChangeSong();
-            _this.render();
+            _this.handleDOMNewSong();
             _this.scrollToSong();
+        }
+
+        //Click song
+        playList.onclick = function(e){
+            if(e.target.closest('.song:not(.song-active)')){
+                _this.currentIndex = e.target.getAttribute('data-index');
+                _this.loadCurrentSong();
+                audio.play();
+                _this.handleDOMNewSong();
+            }
         }
     },
     nextSong: function(){
@@ -278,6 +295,12 @@ const appMusicPlayer = {
         }
         progress.value = 0;
         audio.play();
+    },
+    handleDOMNewSong: function(){
+        var songActiveCurrent = $('.song.song-active');
+        songActiveCurrent.classList.remove('song-active');
+        var newSong = $(`div[data-index="${this.currentIndex}"]`);
+        newSong.classList.add('song-active');
     },
     start: function() {
         this.defineProperty();
